@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenWorld Sniper - Tactical Shooter Game</title>
+    <style>
+        /* Global Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Rajdhani', 'Arial', sans-serif;
+            background: linear-gradient(to bottom, #87CEEB, #1E90FF);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Header & Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 15px 0;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+        }
+
+        .logo span {
+            color: #FF4500;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            margin-left: 25px;
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+            padding: 5px 0;
+        }
+
+        .nav-links a:hover {
+            color: #FFD700;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: #FFD700;
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Game Container */
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            background: linear-gradient(to bottom, #87CEEB, #4682B4);
+        }
+
+        /* Game UI */
+        .game-ui {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 10;
+            color: white;
+            font-size: 18px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+        }
+
+        .ammo-counter {
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .health-bar {
+            width: 200px;
+            height: 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .health-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(to right, #FF0000, #00FF00);
+            transition: width 0.3s;
+        }
+
+        /* Weapon Display */
+        .weapon-display {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10;
+            text-align: right;
+        }
+
+        .weapon-name {
+            font-size: 24px;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+        }
+
+        .weapon-image {
+            height: 100px;
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.7));
+        }
+
+        /* Menu Screens */
+        .menu-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 20;
+            backdrop-filter: blur(5px);
+        }
+
+        .menu-title {
+            font-size: 72px;
+            color: #FFD700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+            margin-bottom: 30px;
+            letter-spacing: 3px;
+        }
+
+        .menu-subtitle {
+            font-size: 24px;
+            margin-bottom: 50px;
+            color: #FFF;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        /* Shining Button */
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(45deg, #FF8C00, #FF4500);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 69, 0, 0.4);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            font-size: 18px;
+            margin: 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 69, 0, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(30deg);
+            transition: all 0.3s;
+        }
+
+        .btn:hover::after {
+            left: 100%;
+        }
+
+        /* Ad Container */
+        .ad-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        /* Footer */
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            z-index: 100;
+            font-size: 14px;
+        }
+
+        footer a {
+            color: #FFD700;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Crosshair */
+        .crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            z-index: 10;
+        }
+
+        .crosshair::before, .crosshair::after {
+            content: '';
+            position: absolute;
+            background-color: rgba(255, 215, 0, 0.8);
+        }
+
+        .crosshair::before {
+            width: 2px;
+            height: 20px;
+            left: 9px;
+            top: 0;
+        }
+
+        .crosshair::after {
+            width: 20px;
+            height: 2px;
+            left: 0;
+            top: 9px;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Google AdSense Script -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_AD_UNIT_ID"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">OPENWORLD<span>SNIPER</span></div>
+                <div class="nav-links">
+                    <a href="#">Home</a>
+                    <a href="#">Weapons</a>
+                    <a href="#">Maps</a>
+                    <a href="#">Leaderboards</a>
+                    <a href="#">Settings</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Game Container -->
+    <div id="game-container">
+        <!-- Game Canvas -->
+        <canvas id="game-canvas"></canvas>
+        
+        <!-- Crosshair -->
+        <div class="crosshair"></div>
+        
+        <!-- Game UI -->
+        <div class="game-ui">
+            <div class="ammo-counter">
+                AMMO: <span id="ammo">12</span>/<span id="max-ammo">36</span>
+            </div>
+            <div class="health-bar">
+                <div class="health-fill" id="health-fill" style="width: 100%;"></div>
+            </div>
+        </div>
+        
+        <!-- Weapon Display -->
+        <div class="weapon-display">
+            <div class="weapon-name" id="weapon-name">DESERT EAGLE</div>
+            <img src="https://www.freeiconspng.com/uploads/gun-png-27.png" class="weapon-image" id="weapon-image">
+        </div>
+        
+        <!-- Ad Container -->
+        <div class="ad-container">
+            <!-- Google AdSense Ad Unit -->
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-ca-app-pub-7987935420362888~5698320283
+                 data-ad-slot="ca-app-pub-7987935420362888/8911415798
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+        
+        <!-- Start Menu -->
+        <div class="menu-screen" id="start-menu">
+            <h1 class="menu-title">OPENWORLD SNIPER</h1>
+            <p class="menu-subtitle">Tactical combat in an expansive open world. Survive, complete missions, and dominate the battlefield.</p>
+            <button class="btn" id="start-btn">START GAME</button>
+            <button class="btn" id="loadout-btn">CUSTOMIZE LOADOUT</button>
+            <button class="btn" id="settings-btn">SETTINGS</button>
+        </div>
+        
+        <!-- Pause Menu -->
+        <div class="menu-screen" id="pause-menu" style="display: none;">
+            <h1 class="menu-title">GAME PAUSED</h1>
+            <button class="btn" id="resume-btn">RESUME</button>
+            <button class="btn" id="restart-btn">RESTART</button>
+            <button class="btn" id="quit-btn">QUIT TO MENU</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 OpenWorld Sniper. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a> | <a href="#">Support</a></p>
+        </div>
+    </footer>
+
+    <script>
+        // Game Variables
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const startMenu = document.getElementById('start-menu');
+        const pauseMenu = document.getElementById('pause-menu');
+        const startBtn = document.getElementById('start-btn');
+        const resumeBtn = document.getElementById('resume-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const quitBtn = document.getElementById('quit-btn');
+        const ammoElement = document.getElementById('ammo');
+        const maxAmmoElement = document.getElementById('max-ammo');
+        const healthFill = document.getElementById('health-fill');
+        const weaponName = document.getElementById('weapon-name');
+        const weaponImage = document.getElementById('weapon-image');
+
+        // Set canvas size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Game State
+        let gameRunning = false;
+        let gamePaused = false;
+        let health = 100;
+        let ammo = 12;
+        let maxAmmo = 36;
+        let currentWeapon = 'Desert Eagle';
+
+        // Enemy data
+        const enemies = [];
+        let lastEnemySpawn = 0;
+        const enemySpawnRate = 2000; // ms
+
+        // Bullets
+        const bullets = [];
+        const bulletSpeed = 15;
+
+        // Terrain
+        const terrain = [];
+        const terrainSize = 20;
+
+        // Generate terrain
+        function generateTerrain() {
+            for (let i = 0; i < terrainSize; i++) {
+                terrain.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    width: Math.random() * 100 + 50,
+                    height: Math.random() * 100 + 50,
+                    color: `rgb(${Math.floor(Math.random() * 100 + 50)}, ${Math.floor(Math.random() * 100 + 100)}, ${Math.floor(Math.random() * 50)})`
+                });
+            }
+        }
+
+        // Initialize Game
+        function initGame() {
+            health = 100;
+            ammo = 12;
+            maxAmmo = 36;
+            enemies.length = 0;
+            bullets.length = 0;
+            terrain.length = 0;
+            generateTerrain();
+            updateUI();
+        }
+
+        // Update UI
+        function updateUI() {
+            ammoElement.textContent = ammo;
+            maxAmmoElement.textContent = maxAmmo;
+            healthFill.style.width = `${health}%`;
+            weaponName.textContent = currentWeapon.toUpperCase();
+        }
+
+        // Spawn Enemy
+        function spawnEnemy() {
+            const size = Math.random() * 30 + 30;
+            enemies.push({
+                x: Math.random() > 0.5 ? 
+                    -size : 
+                    canvas.width + size,
+                y: Math.random() * canvas.height,
+                width: size,
+                height: size,
+                speedX: (Math.random() * 2 + 1) * (Math.random() > 0.5 ? 1 : -1),
+                speedY: (Math.random() * 2 - 1),
+                health: 100
+            });
+        }
+
+        // Shoot Bullet
+        function shootBullet() {
+            if (ammo <= 0) return;
+            
+            ammo--;
+            updateUI();
+            
+            bullets.push({
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                speedX: (Math.random() * 4 - 2),
+                speedY: -bulletSpeed,
+                size: 5
+            });
+            
+            // Recoil effect
+            canvas.style.transform = 'translateY(5px)';
+            setTimeout(() => {
+                canvas.style.transform = 'translateY(0)';
+            }, 100);
+        }
+
+        // Reload
+        function reload() {
+            const needed = 12 - ammo;
+            if (needed <= 0 || maxAmmo <= 0) return;
+            
+            const reloadAmount = Math.min(needed, maxAmmo);
+            ammo += reloadAmount;
+            maxAmmo -= reloadAmount;
+            updateUI();
+        }
+
+        // Damage Player
+        function damagePlayer(amount) {
+            health = Math.max(0, health - amount);
+            updateUI();
+            
+            if (health <= 0) {
+                gameOver();
+            }
+        }
+
+        // Game Over
+        function gameOver() {
+            gameRunning = false;
+            alert('Game Over! Your performance was exceptional soldier.');
+            startMenu.style.display = 'flex';
+        }
+
+        // Draw Terrain
+        function drawTerrain() {
+            ctx.save();
+            terrain.forEach(item => {
+                ctx.fillStyle = item.color;
+                ctx.fillRect(item.x, item.y, item.width, item.height);
+                
+                // Add some details
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                ctx.fillRect(item.x + 5, item.y + 5, item.width - 10, item.height - 10);
+            });
+            ctx.restore();
+        }
+
+        // Draw Enemies
+        function drawEnemies() {
+            ctx.save();
+            enemies.forEach(enemy => {
+                // Body
+                ctx.fillStyle = 'rgba(200, 50, 50, 0.8)';
+                ctx.beginPath();
+                ctx.arc(enemy.x, enemy.y, enemy.width / 2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Health bar
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                ctx.fillRect(enemy.x - enemy.width / 2, enemy.y - enemy.width / 2 - 10, enemy.width, 5);
+                ctx.fillStyle = 'rgba(0, 255, 0, 0.7)';
+                ctx.fillRect(enemy.x - enemy.width / 2, enemy.y - enemy.width / 2 - 10, enemy.width * (enemy.health / 100), 5);
+            });
+            ctx.restore();
+        }
+
+        // Draw Bullets
+        function drawBullets() {
+            ctx.save();
+            bullets.forEach(bullet => {
+                ctx.fillStyle = '#FFD700';
+                ctx.beginPath();
+                ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Bullet trail
+                ctx.strokeStyle = 'rgba(255, 215, 0, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(bullet.x, bullet.y);
+                ctx.lineTo(bullet.x - bullet.speedX * 2, bullet.y - bullet.speedY * 2);
+                ctx.stroke();
+            });
+            ctx.restore();
+        }
+
+        // Update Game Objects
+        function updateGameObjects() {
+            const now = Date.now();
+            
+            // Spawn enemies periodically
+            if (now - lastEnemySpawn > enemySpawnRate) {
+                spawnEnemy();
+                lastEnemySpawn = now;
+            }
+            
+            // Update enemies
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                enemies[i].x += enemies[i].speedX;
+                enemies[i].y += enemies[i].speedY;
+                
+                // Remove enemies that are off screen
+                if (enemies[i].x < -100 || 
+                    enemies[i].x > canvas.width + 100 ||
+                    enemies[i].y < -100 || 
+                    enemies[i].y > canvas.height + 100) {
+                    enemies.splice(i, 1);
+                }
+            }
+            
+            // Update bullets
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                bullets[i].x += bullets[i].speedX;
+                bullets[i].y += bullets[i].speedY;
+                
+                // Remove bullets that are off screen
+                if (bullets[i].y < 0 || 
+                    bullets[i].x < 0 || 
+                    bullets[i].x > canvas.width) {
+                    bullets.splice(i, 1);
+                }
+            }
+            
+            // Check bullet-enemy collisions
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                for (let j = enemies.length - 1; j >= 0; j--) {
+                    const dx = bullets[i].x - enemies[j].x;
+                    const dy = bullets[i].y - enemies[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < enemies[j].width / 2 + bullets[i].size) {
+                        // Hit enemy
+                        enemies[j].health -= 25;
+                        bullets.splice(i, 1);
+                        
+                        if (enemies[j].health <= 0) {
+                            enemies.splice(j, 1);
+                        }
+                        break;
+                    }
+                }
+            }
+            
+            // Check enemy-player collisions
+            enemies.forEach(enemy => {
+                const dx = canvas.width / 2 - enemy.x;
+                const dy = canvas.height / 2 - enemy.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < enemy.width / 2 + 20) {
+                    damagePlayer(1);
+                }
+            });
+        }
+
+        // Game Loop
+        function gameLoop() {
+            if (!gameRunning || gamePaused) return;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw sky gradient
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            skyGradient.addColorStop(0, '#87CEEB');
+            skyGradient.addColorStop(1, '#1E90FF');
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw terrain
+            drawTerrain();
+            
+            // Update and draw game objects
+            updateGameObjects();
+            drawEnemies();
+            drawBullets();
+            
+            // Draw horizon line
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height / 2);
+            ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Event Listeners
+        startBtn.addEventListener('click', () => {
+            initGame();
+            startMenu.style.display = 'none';
+            gameRunning = true;
+            gamePaused = false;
+            gameLoop();
+        });
+
+        resumeBtn.addEventListener('click', () => {
+            pauseMenu.style.display = 'none';
+            gamePaused = false;
+            gameLoop();
+        });
+
+        restartBtn.addEventListener('click', () => {
+            initGame();
+            pauseMenu.style.display = 'none';
+            gamePaused = false;
+            gameLoop();
+        });
+
+        quitBtn.addEventListener('click', () => {
+            pauseMenu.style.display = 'none';
+            startMenu.style.display = 'flex';
+            gameRunning = false;
+        });
+
+        // Keyboard Controls
+        document.addEventListener('keydown', (e) => {
+            if (!gameRunning) return;
+            
+            switch (e.key) {
+                case ' ':
+                    shootBullet();
+                    break;
+                case 'r':
+                    reload();
+                    break;
+                case 'Escape':
+                    gamePaused = !gamePaused;
+                    pauseMenu.style.display = gamePaused ? 'flex' : 'none';
+                    break;
+                case '1':
+                    currentWeapon = 'Desert Eagle';
+                    weaponImage.src = 'https://www.freeiconspng.com/uploads/gun-png-27.png';
+                    updateUI();
+                    break;
+                case '2':
+                    currentWeapon = 'AK-47';
+                    weaponImage.src = 'https://www.freeiconspng.com/uploads/ak47-png-5.png';
+                    updateUI();
+                    break;
+                case '3':
+                    currentWeapon = 'Sniper Rifle';
+                    weaponImage.src = 'https://www.freeiconspng.com/uploads/sniper-rifle-png-2.png';
+                    updateUI();
+                    break;
+            }
+        });
+
+        // Mouse Controls
+        canvas.addEventListener('click', () => {
+            if (gameRunning && !gamePaused) {
+                shootBullet();
+            }
+        });
+
+        // Window Resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Initialize weapon image
+        weaponImage.src = 'https://www.freeiconspng.com/uploads/gun-png-27.png';
+    </script>
+</body>
+</html>
