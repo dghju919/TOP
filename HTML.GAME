@@ -110,7 +110,7 @@
      style="display:block; text-align:center;"
      data-ad-layout="in-article"
      data-ad-format="fluid"
-     data-ad-client="ca-pub-7987935420362888"
+     data-ad-client="ca-pubca-app-pub-7987935420362888/9428153051
      data-ad-slot="7247814487"></ins>
 <script>
      (adsbygoogle = window.adsbygoogle || []).push({});
@@ -308,7 +308,7 @@
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Google AdSense Script -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_AD_UNIT_ID"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-ca-app-pub-7987935420362888/9428153051"></script>
 </head>
 <body>
     <!-- Header -->
@@ -356,8 +356,8 @@
             <!-- Google AdSense Ad Unit -->
             <ins class="adsbygoogle"
                  style="display:block"
-                 data-ad-client="ca-pub-ca-app-pub-7987935420362888~5698320283
-                 data-ad-slot="ca-app-pub-7987935420362888/8911415798
+                 data-ad-client="ca-pub-ca-app-pubca-app-pub-7987935420362888~5698320283
+                 data-ad-slot="ca-app-pubca-app-pub-7987935420362888/9428153051
                  data-ad-format="auto"
                  data-full-width-responsive="true"></ins>
             <script>
@@ -513,7 +513,7 @@
             updateUI();
         }
 
-        // Damage Player
+        // Damage Player // move player {
         function damagePlayer(amount) {
             health = Math.max(0, health - amount);
             updateUI();
@@ -569,7 +569,7 @@
             bullets.forEach(bullet => {
                 ctx.fillStyle = '#FFD700';
                 ctx.beginPath();
-                ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
+                ctx.arc(bullet.x, bullet.y, bullet.size, 2, Math.PI * 2);
                 ctx.fill();
                 
                 // Bullet trail
@@ -748,7 +748,7 @@
 
         // Mouse Controls
         canvas.addEventListener('click', () => {
-            if (gameRunning && !gamePaused) {
+            if (gameRunning &&w !gamePaused) {
                 shootBullet();
             }
         });
